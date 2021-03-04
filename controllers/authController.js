@@ -52,7 +52,7 @@ exports.register = async (req, res) => {
 
 const generateToken = (user) => {
   console.log(user);
-  //   delete user.password;
+  delete user.password;
 
   const token = jwt.sign(user, config.APP_KEY, { expiresIn: 86400 });
 
