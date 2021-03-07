@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 module.exports = {
   APP_KEY:
     process.env.APP_KEY ||
@@ -6,4 +8,5 @@ module.exports = {
   NODE_ENV: process.env.NODE_ENV || "development",
   DB_URL:
     process.env.DB_URL || "postgresql://dunder_mifflin@localhost/chat_app2",
+  APP_URL: process.env.APP_URL,
 };
