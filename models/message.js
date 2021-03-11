@@ -1,4 +1,5 @@
 "use strict";
+
 const config = require("../config/config");
 
 const { Model } = require("sequelize");
@@ -12,7 +13,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       this.belongsTo(models.Chat, { foreignKey: "chatId" });
-      this.belongsTo(models.User, { foreignKey: "fromUserId" });
+      this.belongsTo(models.User, { foreignKey: "fromuserId" });
     }
   }
   Message.init(
@@ -31,7 +32,7 @@ module.exports = (sequelize, DataTypes) => {
         },
       },
       chatId: DataTypes.INTEGER,
-      fromUserId: DataTypes.INTEGER,
+      fromuserId: DataTypes.INTEGER,
     },
     {
       sequelize,

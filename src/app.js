@@ -6,6 +6,7 @@ const helmet = require("helmet");
 const { NODE_ENV } = require("../config/config");
 const router = require("../router");
 const bodyParser = require("body-parser");
+// const http = require("http");
 
 const app = express();
 
@@ -18,8 +19,12 @@ app.use(helmet());
 app.use(cors());
 app.use(router);
 
-app.use(express.static(__dirname + "/public"));
+app.use(express.static("public"));
 app.use(express.static(__dirname + "/uploads"));
+
+// const server = http.createServer(app);
+// const SocketServer = require("../socket");
+// SocketServer(server);
 
 app.get("/", (req, res) => {
   res.send("Hello, world!");

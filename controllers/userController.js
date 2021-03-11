@@ -19,7 +19,7 @@ exports.update = async (req, res) => {
     });
 
     const user = result[0].get({ raw: true });
-
+    console.log(result[0].avatar);
     user.avatar = result[0].avatar;
     delete user.password;
 
