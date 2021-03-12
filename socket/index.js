@@ -1,5 +1,6 @@
 const socketIo = require("socket.io");
 const { sequelize } = require("../models");
+const Message = require("../models").Message;
 
 const users = new Map();
 const userSockets = new Map();
@@ -8,7 +9,7 @@ const SocketServer = (server) => {
   const io = socketIo(server, {
     cors: {
       origin: "http://localhost:3000",
-      methods: ["GET", "POST"],
+      methods: ["GET", "POST", "DELETE", "UPDATE"],
     },
   });
 
@@ -50,6 +51,41 @@ const SocketServer = (server) => {
           io.to(socket).emit("friends", onlineFriends);
         } catch (e) {}
       });
+    });
+
+    socket.on("message", async (message) => {
+      let sockets = [];
+
+      if (users.has(message.fromUser.id)) {
+        sockets = users.get(message.fromUser.id).sockets;
+      }
+
+      message.toUserId.forEach((id) => {
+        if (users.has(id)) {
+          sockets = [...sockets, ...users.get(id).sockets];
+        }
+      });
+
+      try {
+        const msg = {
+          type: message.type,
+          fromuserId: message.fromUser.id,
+          chatId: message.chatId,
+          message: message.message,
+        };
+
+        const savedMessage = await Message.create(msg);
+
+        message.User = message.fromUser;
+        message.fromuserId = message.fromUser.id;
+        message.id = savedMessage.id;
+        message.message = savedMessage.message;
+        delete message.fromUser;
+
+        sockets.forEach((socket) => {
+          io.to(socket).emit("received", message);
+        });
+      } catch (e) {}
     });
     socket.on("disconnect", async () => {
       if (userSockets.has(socket.id)) {
