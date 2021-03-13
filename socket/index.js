@@ -56,9 +56,18 @@ const SocketServer = (server) => {
     socket.on("message", async (message) => {
       let sockets = [];
 
-      if (users.has(message.fromUser.id)) {
-        sockets = users.get(message.fromUser.id).sockets;
+      if (users.has(message.fromuser.id)) {
+        sockets = users.get(message.fromuser.id).sockets;
       }
+
+      //   try {
+      //     console.log({ message });
+      //     if (users.has(message.fromuserId)) {
+      //       sockets = users.get(message.fromuserId).sockets;
+      //     }
+      //   } catch (e) {
+      //     console.log(e);
+      //   }
 
       message.toUserId.forEach((id) => {
         if (users.has(id)) {
@@ -69,23 +78,33 @@ const SocketServer = (server) => {
       try {
         const msg = {
           type: message.type,
-          fromuserId: message.fromUser.id,
+          fromuserId: message.fromuser.id,
           chatId: message.chatId,
           message: message.message,
         };
 
         const savedMessage = await Message.create(msg);
 
-        message.User = message.fromUser;
-        message.fromuserId = message.fromUser.id;
+        message.User = message.fromuser;
+        message.fromuserId = message.fromuser.id;
         message.id = savedMessage.id;
         message.message = savedMessage.message;
-        delete message.fromUser;
+        delete message.fromuser;
 
         sockets.forEach((socket) => {
           io.to(socket).emit("received", message);
         });
       } catch (e) {}
+    });
+
+    socket.on("typing", (message) => {
+      message.toUserId.forEach((id) => {
+        if (users.has(id)) {
+          users.get(id).sockets.forEach((socket) => {
+            io.to(socket).emit("typing", message);
+          });
+        }
+      });
     });
     socket.on("disconnect", async () => {
       if (userSockets.has(socket.id)) {
