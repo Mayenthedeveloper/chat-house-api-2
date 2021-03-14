@@ -106,6 +106,92 @@ const SocketServer = (server) => {
         }
       });
     });
+
+    socket.on("add-friend", (chats) => {
+      try {
+        let online = "offline";
+        if (users.has(chats[1].Users[0].id)) {
+          online = "online";
+          chats[0].Users[0].status = "online";
+          users.get(chats[1].Users[0].id).sockets.forEach((socket) => {
+            io.to(socket).emit("new-chat", chats[0]);
+          });
+        }
+
+        if (users.has(chats[0].Users[0].id)) {
+          chats[1].Users[0].status = online;
+          users.get(chats[0].Users[0].id).sockets.forEach((socket) => {
+            io.to(socket).emit("new-chat", chats[1]);
+          });
+        }
+      } catch (e) {}
+    });
+
+    socket.on("add-user-to-group", ({ chat, newChatter }) => {
+      if (users.has(newChatter.id)) {
+        newChatter.status = "online";
+      }
+
+      // old users
+      chat.Users.forEach((user, index) => {
+        if (users.has(user.id)) {
+          chat.Users[index].status = "online";
+          users.get(user.id).sockets.forEach((socket) => {
+            try {
+              io.to(socket).emit("added-user-to-group", {
+                chat,
+                chatters: [newChatter],
+              });
+            } catch (e) {}
+          });
+        }
+      });
+
+      // send to new chatter
+      if (users.has(newChatter.id)) {
+        users.get(newChatter.id).sockets.forEach((socket) => {
+          try {
+            io.to(socket).emit("added-user-to-group", {
+              chat,
+              chatters: chat.Users,
+            });
+          } catch (e) {}
+        });
+      }
+    });
+
+    socket.on("leave-current-chat", (data) => {
+      const { chatId, userId, currentUserId, notifyUsers } = data;
+
+      notifyUsers.forEach((id) => {
+        if (users.has(id)) {
+          users.get(id).sockets.forEach((socket) => {
+            try {
+              io.to(socket).emit("remove-user-from-chat", {
+                chatId,
+                userId,
+                currentUserId,
+              });
+            } catch (e) {}
+          });
+        }
+      });
+    });
+
+    socket.on("delete-chat", (data) => {
+      const { chatId, notifyUsers } = data;
+
+      notifyUsers.forEach((id) => {
+        if (users.has(id)) {
+          users.get(id).sockets.forEach((socket) => {
+            try {
+              io.to(socket).emit("delete-chat", parseInt(chatId));
+            } catch (e) {}
+          });
+        }
+      });
+    });
+
     socket.on("disconnect", async () => {
       if (userSockets.has(socket.id)) {
         const user = users.get(userSockets.get(socket.id));
