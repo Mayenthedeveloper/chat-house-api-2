@@ -82,7 +82,8 @@ const SocketServer = (server) => {
           chatId: message.chatId,
           message: message.message,
         };
-
+        console.log("Checking socket message");
+        console.log(msg.message);
         const savedMessage = await Message.create(msg);
 
         message.User = message.fromuser;

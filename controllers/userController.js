@@ -19,7 +19,6 @@ exports.update = async (req, res) => {
     });
 
     const user = result[0].get({ raw: true });
-    console.log(result[0].avatar);
     user.avatar = result[0].avatar;
     delete user.password;
 
@@ -27,12 +26,13 @@ exports.update = async (req, res) => {
   } catch (e) {
     return res.status(500).json({ error: e.message });
   }
-
-  return res.send("User Controller");
 };
 
 exports.search = async (req, res) => {
+  console.log("Query term");
+  console.log(req.query.term);
   try {
+    console.log("checing");
     const users = await User.findAll({
       where: {
         [sequelize.Op.or]: {
@@ -57,7 +57,8 @@ exports.search = async (req, res) => {
       },
       limit: 10,
     });
-
+    console.log("Search user");
+    console.log(res);
     return res.json(users);
   } catch (e) {
     return res.status(500).json({ error: e.message });

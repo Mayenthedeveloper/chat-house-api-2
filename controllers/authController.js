@@ -42,7 +42,8 @@ exports.register = async (req, res) => {
   }
   try {
     const user = await User.create(req.body);
-
+    console.log("Checking user");
+    console.log(user);
     const userWithToken = generateToken(user.get({ raw: true }));
 
     return res.send(userWithToken);
@@ -55,7 +56,7 @@ const generateToken = (user) => {
   console.log(user);
   delete user.password;
 
-  const token = jwt.sign(user, config.APP_KEY, { expiresIn: 5 });
+  const token = jwt.sign(user, config.APP_KEY, { expiresIn: 86000 });
 
   return { ...{ user }, ...{ token } };
 };

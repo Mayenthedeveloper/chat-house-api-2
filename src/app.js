@@ -20,7 +20,7 @@ app.use(cors());
 app.use(router);
 
 app.use(express.static("public"));
-app.use(express.static(__dirname + "/uploads"));
+app.use(express.static("uploads"));
 
 // const server = http.createServer(app);
 // const SocketServer = require("../socket");

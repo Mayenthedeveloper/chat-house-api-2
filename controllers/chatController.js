@@ -242,7 +242,6 @@ exports.addUserToGroup = async (req, res) => {
 
 exports.deleteChat = async (req, res) => {
   const { id } = req.params;
-
   try {
     const chat = await Chat.findOne({
       where: {
@@ -256,7 +255,7 @@ exports.deleteChat = async (req, res) => {
     });
 
     const notifyUsers = chat.Users.map((user) => user.id);
-
+    console.log(chat);
     await chat.destroy();
     return res.json({ chatId: id, notifyUsers });
   } catch (e) {
