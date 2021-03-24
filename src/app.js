@@ -6,7 +6,6 @@ const helmet = require("helmet");
 const { NODE_ENV } = require("../config/config");
 const router = require("../router");
 const bodyParser = require("body-parser");
-// const http = require("http");
 
 const app = express();
 
